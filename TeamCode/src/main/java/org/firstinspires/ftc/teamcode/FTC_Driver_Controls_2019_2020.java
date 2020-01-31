@@ -38,6 +38,9 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -64,8 +67,8 @@ public class FTC_Driver_Controls_2019_2020 extends LinearOpMode {
     private DcMotor motor5 = null;
     private DcMotor motor6 = null;
     private Servo servo0 = null;
-    private CRServo servo1 = null;
-
+    private Servo leftServo = null;
+    private Servo rightServo = null;
 
 
     private static void verticalMotion(DcMotor motor_1,DcMotor motor_2,DcMotor motor_3,DcMotor motor_4,double power){
@@ -111,58 +114,134 @@ public class FTC_Driver_Controls_2019_2020 extends LinearOpMode {
         motor5 = hardwareMap.get(DcMotor.class, "motor5");
         motor6 = hardwareMap.get(DcMotor.class, "motor6");
         servo0 = hardwareMap.get(Servo.class, "servo0");
+        leftServo = hardwareMap.get(Servo.class, "leftServo");
+        rightServo = hardwareMap.get(Servo.class, "rightServo");
 
-        float servoMode = 1;
-        servo0.setPosition(0.5);
-
-
+        float servoMode = (float)0.5;
+        boolean clawOpen = false;
+        boolean foundationClawOpen = false;
+        boolean xPressFlag = false;
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-
-            if (gamepad1.a){
-                servoMode -= 0.01;
-                if(servoMode<0){
-                    servoMode = 0;
+            if(false){
+                if(gamepad1.a){
+                    if(clawOpen)
+                        servo0.setPosition(1.0);
+                    else
+                        servo0.setPosition(0.5);
                 }
 
-            }else if (gamepad1.b){
-                servoMode += 0.01;
-                if(servoMode>1){
-                    servoMode = 1;
-                }
             }
+            if(true){
+                if(!gamepad1.x)
+                    xPressFlag = false;
+                telemetry.addData("leftServo",leftServo.getPosition());
+                telemetry.addData("leftServoController",leftServo.getController().getServoPosition(leftServo.getPortNumber()));
 
-            double servoMode1 = servoMode;
+                if (leftServo.getPosition() == .5)
+                    foundationClawOpen = false;
+                if(leftServo.getPosition() == 0 )
+                    foundationClawOpen = true;
 
-            servo0.setPosition(servoMode1);
 
-            telemetry.addData("servoPos", servoMode1);
+                if(gamepad1.x && !xPressFlag) {
+                    xPressFlag = true;
+                    if (foundationClawOpen) {
+                        leftServo.setPosition(0.5);
+                        rightServo.setPosition(0.36);
 
+
+                    } else {
+                        leftServo.setPosition(0);
+                        rightServo.setPosition(0.85);
+                    }
+                }
+
+
+            }
+            if(false){
+                if (gamepad1.a) {
+                    servoMode -= 0.01;
+                    if (servoMode < 0.5) {
+                        servoMode = (float) 0.5;
+                    }
+
+                } else if (gamepad1.b) {
+                    servoMode += 0.01;
+                    if (servoMode > 1) {
+                        servoMode = 1;
+                    }
+                }
+
+                double servoMode1 = servoMode;
+
+                servo0.setPosition(servoMode1);
+
+                telemetry.addData("servoPos", servoMode1);
+            }
 
 
             //servo1.setPower();
 
-
-            if (gamepad1.right_bumper){
-                motor5.setPower(0.325);
-            }else if (gamepad1.left_bumper){
-                motor5.setPower(-0.325);
-            }else{
-                motor5.setPower(0);
+            if(false) {
+                if (gamepad1.right_bumper) {
+                    motor5.setPower(0.65);
+                } else if (gamepad1.left_bumper) {
+                    motor5.setPower(-0.65);
+                } else {
+                    motor5.setPower(0);
+                }
             }
 
-            if(gamepad1.x){
-                motor6.setPower(0.25);
-            }else if(gamepad1.y){
-                motor6.setPower(-0.25);
-            }else
-                motor6.setPower(0);
+
+
+            if(!gamepad1.right_bumper && gamepad1.right_trigger == 0)
+                motor5.setPower(0);
+            else if(gamepad1.right_bumper)
+                motor5.setPower(0.65);
+            else if(gamepad1.right_trigger !=0)
+                motor5.setPower(-0.65);
+
+            if(gamepad1.left_bumper) {
+                servoMode -= 0.01;
+                if (servoMode < 0.5) {
+                    servoMode = (float) 0.5;
+                }
+            }
+            else if(gamepad1.left_trigger !=0){
+                servoMode += 0.01;
+                if (servoMode > 1) {
+                    servoMode = 1;
+                }
+            }
+            double servoMode1 = servoMode;
+
+            servo0.setPosition(servoMode1);
+
+
+            if(false){
+                if(gamepad1.x){
+                    motor6.setPower(0.5);
+                }else if(gamepad1.y){
+                    motor6.setPower(-0.5);
+                }else
+                    motor6.setPower(0);
+            }
+
+            if(false){
+                if(gamepad1.right_trigger != 0)
+                    motor6.setPower(0.5);
+                else if(gamepad1.left_trigger != 0)
+                    motor6.setPower(-0.5);
+                else
+                    motor6.setPower(0);
+            }
+
+
 
             boolean check1 = true;
             boolean check2 = true;

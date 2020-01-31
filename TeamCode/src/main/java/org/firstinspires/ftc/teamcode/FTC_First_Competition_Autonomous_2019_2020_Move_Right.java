@@ -59,7 +59,7 @@ import java.util.List;
 
 @Autonomous
 //@Disabled
-public class FTC_First_Competition_Autonomous_2019_2020_Blue extends LinearOpMode {
+public class FTC_First_Competition_Autonomous_2019_2020_Move_Right extends LinearOpMode {
 
     //TensorFlow copyPaste
     private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
@@ -81,7 +81,10 @@ public class FTC_First_Competition_Autonomous_2019_2020_Blue extends LinearOpMod
     private DcMotor motor3 = null;
     private DcMotor motor4 = null;
     private DcMotor motor5 = null;
+    private DcMotor motor6 = null;
     private Servo servo0 = null;
+    private Servo leftServo = null;
+    private Servo rightServo = null;
 
 
 
@@ -119,19 +122,25 @@ public class FTC_First_Competition_Autonomous_2019_2020_Blue extends LinearOpMod
         motor3 = hardwareMap.get(DcMotor.class, "motor3");
         motor4 = hardwareMap.get(DcMotor.class, "motor4");
         motor5 = hardwareMap.get(DcMotor.class, "motor5");
+        motor6 = hardwareMap.get(DcMotor.class, "motor6");
         servo0 = hardwareMap.get(Servo.class, "servo0");
+        leftServo = hardwareMap.get(Servo.class, "leftServo");
+        rightServo = hardwareMap.get(Servo.class, "rightServo");
 
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         // Wait for the game to start (driver presses PLAY)
-        servo0.setPosition(0);
+        //servo0.setPosition(0);
 
         boolean center = false;
         boolean right = false;
         boolean left = false;
         boolean goldDetected = false;
         boolean autonomousCompleted = false;
+
+
+        servo0.setPosition(0.25);
 
         waitForStart();
 
@@ -141,21 +150,50 @@ public class FTC_First_Competition_Autonomous_2019_2020_Blue extends LinearOpMod
             }
             while (opModeIsActive()) {
                 if(!autonomousCompleted) {
-                   /* horizontalMove(-0.5,2.9);
-                    wait(1.0);
-                    verticalMove(-0.5,3.1);
-                    wait(1.0);
-                    horizontalMove(-0.5,2.1);
-                    wait(1.0);
-                    verticalMove(0.5,1.65);
-                    wait(1.0);*/
+                    wait(0.7);
 
-                    verticalMove(-0.5, 0.9);
-                    wait(1.0);
-                    horizontalMove(0.5,0.375);
+                    motor6.setPower(0.5);
+                    wait(0.85);
+                    motor6.setPower(0);
+                    servo0.setPosition(1.0);
+                    wait(0.7);
+                    verticalMove(-1.0,0.85);
+                    wait(0.7);
+                    servo0.setPosition(0.5);
+                    wait(0.7);
+                    motor6.setPower(-0.5);
+                    wait(0.9);
+                    motor6.setPower(0);
+                    wait(0.7);
+                    verticalMove(1.0,0.85);
+                    horizontalMove(1.0,3.84);
+                    wait(0.7);
+                    verticalMove(-1.0,0.924);
+                    wait(0.7);
+                    servo0.setPosition(1.0);
+                    wait(0.7);
+                    leftServo.setPosition(0.5);
+                    rightServo.setPosition(0.36);
+                    wait(0.7);
+                    verticalMove(1.0,0.924);
+                    wait(0.7);
+
+                    servo0.setPosition(0.4);
+                    horizontalMove(-1.0,2.05);
+                    //servo0.setPosition(1.0);
+                    //horizontalMove(-1.0,0.776595744680851);
+
+
+                    //wait(1.0);
+                    //servo0.setPosition(0.9);
+                    //verticalMove(1.0,0.9242424242424242);
+                    //wait(1.0);
+                    //servo0.setPosition(0);
+
+                    //horizontalMove(-1.0,2.3085106382978724);
 
                 }
-                while (!(center || right || left)&& opModeIsActive()){
+                while (opModeIsActive()){
                     if (tfod != null) {
                         // getUpdatedRecognitions() will return null if no new information is available since
                         // the last time that call was made.
@@ -233,10 +271,10 @@ public class FTC_First_Competition_Autonomous_2019_2020_Blue extends LinearOpMod
 
 
     private void verticalMove(double power, double t) {
-        motor1.setPower(power);
-        motor2.setPower(power);
-        motor3.setPower(-1*power);
-        motor4.setPower(-1*power);
+        motor1.setPower(-power);
+        motor2.setPower(-power);
+        motor3.setPower(power);
+        motor4.setPower(power);
         timer.reset();
         while (timer.seconds() < t && opModeIsActive()){
 
@@ -248,10 +286,10 @@ public class FTC_First_Competition_Autonomous_2019_2020_Blue extends LinearOpMod
     }
     private void horizontalMove(double power, double t) {
 
-        motor1.setPower(power);
-        motor2.setPower(-1*power);
-        motor3.setPower(-1*power);
-        motor4.setPower(power);
+        motor1.setPower(-power);
+        motor2.setPower(power);
+        motor3.setPower(power);
+        motor4.setPower(-power);
         timer.reset();
         while (timer.seconds() < t && opModeIsActive()){
 
